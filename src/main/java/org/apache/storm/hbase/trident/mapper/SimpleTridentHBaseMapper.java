@@ -64,13 +64,11 @@ public class SimpleTridentHBaseMapper implements TridentHBaseMapper {
     }
 
 
-    @Override
     public byte[] rowKey(TridentTuple tuple) {
         Object objVal = tuple.getValueByField(this.rowKeyField);
         return toBytes(objVal);
     }
 
-    @Override
     public ColumnList columns(TridentTuple tuple) {
         ColumnList cols = new ColumnList();
         if(this.columnFields != null){

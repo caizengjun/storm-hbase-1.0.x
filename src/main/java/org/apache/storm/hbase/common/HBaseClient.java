@@ -18,7 +18,9 @@
 package org.apache.storm.hbase.common;
 
 import com.google.common.collect.Lists;
+
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.security.UserProvider;
 import org.apache.storm.hbase.bolt.mapper.HBaseProjectionCriteria;
@@ -34,15 +36,25 @@ import java.util.Map;
 public class HBaseClient {
     private static final Logger LOG = LoggerFactory.getLogger(HBaseClient.class);
 
-    private HTable table;
+    private Table table;
 
     public HBaseClient(Map<String, Object> map , final Configuration configuration, final String tableName) {
         try {
             UserProvider provider = HBaseSecurityUtil.login(map, configuration);
-            this.table = provider.getCurrent().getUGI().doAs(new PrivilegedExceptionAction<HTable>() {
-                @Override
-                public HTable run() throws IOException {
-                    return new HTable(configuration, tableName);
+            this.table = provider.getCurrent().getUGI().doAs(new PrivilegedExceptionAction<Table>() {
+
+            	public Table run() throws IOException {
+            		Connection connection = org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(configuration);
+                    
+            		TableName tName= TableName.valueOf(tableName);
+            		Admin admin = connection.getAdmin();
+            		if (!admin.tableExists(tName)) {
+                    	LOG.error("Table does not exist.");
+                    }
+
+                    Table table = connection.getTable(tName, null);
+            		
+                    return table;
                 }
             });
         } catch(Exception e) {
@@ -58,14 +70,14 @@ public class HBaseClient {
             put.setDurability(durability);
             for (ColumnList.Column col : cols.getColumns()) {
                 if (col.getTs() > 0) {
-                    put.add(
+                    put.addColumn(
                             col.getFamily(),
                             col.getQualifier(),
                             col.getTs(),
                             col.getValue()
                     );
                 } else {
-                    put.add(
+                    put.addColumn(
                             col.getFamily(),
                             col.getQualifier(),
                             col.getValue()

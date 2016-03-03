@@ -25,7 +25,6 @@ import java.util.List;
 
 public class HBaseUpdater extends BaseStateUpdater<HBaseState>  {
 
-    @Override
     public void updateState(HBaseState hBaseState, List<TridentTuple> tuples, TridentCollector collector) {
         hBaseState.updateState(tuples, collector);
     }

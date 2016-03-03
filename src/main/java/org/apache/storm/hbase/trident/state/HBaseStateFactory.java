@@ -31,7 +31,6 @@ public class HBaseStateFactory implements StateFactory {
         this.options = options;
     }
 
-    @Override
     public State makeState(Map map, IMetricsContext iMetricsContext, int partitionIndex, int numPartitions) {
         HBaseState state = new HBaseState(map , partitionIndex, numPartitions, options);
         state.prepare();

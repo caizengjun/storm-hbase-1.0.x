@@ -73,15 +73,12 @@ public class WordSpout implements IRichSpout {
         declarer.declare(new Fields("word"));
     }
 
-    @Override
     public void activate() {
     }
 
-    @Override
     public void deactivate() {
     }
 
-    @Override
     public Map<String, Object> getComponentConfiguration() {
         return null;
     }

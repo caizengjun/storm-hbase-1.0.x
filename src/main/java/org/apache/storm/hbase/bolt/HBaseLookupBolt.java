@@ -59,7 +59,6 @@ public class HBaseLookupBolt extends AbstractHBaseBolt {
         return this;
     }
 
-    @Override
     public void execute(Tuple tuple) {
         byte[] rowKey = this.mapper.rowKey(tuple);
         Get get = hBaseClient.constructGetRequests(rowKey, projectionCriteria);
@@ -76,7 +75,6 @@ public class HBaseLookupBolt extends AbstractHBaseBolt {
         }
     }
 
-    @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
         rowToTupleMapper.declareOutputFields(outputFieldsDeclarer);
     }

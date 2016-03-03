@@ -48,11 +48,10 @@ public abstract class AbstractHBaseBolt extends BaseRichBolt {
         this.mapper = mapper;
     }
 
-    @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector collector) {
         this.collector = collector;
         final Configuration hbConfig = HBaseConfiguration.create();
-
+        
         Map<String, Object> conf = (Map<String, Object>)map.get(this.configKey);
         if(conf == null) {
             throw new IllegalArgumentException("HBase configuration not found using key '" + this.configKey + "'");

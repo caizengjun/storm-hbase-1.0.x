@@ -51,7 +51,6 @@ public class WordCounter implements IBasicBolt {
         declarer.declare(new Fields("word", "count"));
     }
 
-    @Override
     public Map<String, Object> getComponentConfiguration() {
         return null;
     }

@@ -3,14 +3,18 @@ package org.apache.storm.hbase.trident.state;
 import backtype.storm.task.IMetricsContext;
 import backtype.storm.topology.FailedException;
 import backtype.storm.tuple.Values;
+
 import com.google.common.collect.Maps;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.security.UserProvider;
 import org.apache.storm.hbase.security.HBaseSecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import storm.trident.state.*;
 import storm.trident.state.map.*;
 
@@ -41,7 +45,7 @@ public class HBaseMapState<T> implements IBackingMap<T> {
 
     private Options<T> options;
     private Serializer<T> serializer;
-    private HTable table;
+    private Table table;
 
     public HBaseMapState(final Options<T> options, Map map, int partitionNum) {
         this.options = options;
@@ -64,10 +68,21 @@ public class HBaseMapState<T> implements IBackingMap<T> {
 
         try{
             UserProvider provider = HBaseSecurityUtil.login(map, hbConfig);
-            this.table = provider.getCurrent().getUGI().doAs(new PrivilegedExceptionAction<HTable>() {
-                @Override
-                public HTable run() throws IOException {
-                    return new HTable(hbConfig, options.tableName);
+            this.table = provider.getCurrent().getUGI().doAs(new PrivilegedExceptionAction<Table>() {
+                public Table run() throws IOException {
+                    
+            		Connection connection = org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(hbConfig);
+                    
+            		TableName tName= TableName.valueOf(options.tableName);
+            		Admin admin = connection.getAdmin();
+            		if (!admin.tableExists(tName)) {
+                    	LOG.error("Table does not exist.");
+                    }
+
+                    Table table = connection.getTable(tName, null);
+            		
+                    return table;
+                	
                 }
             });
         } catch(Exception e){
@@ -168,7 +183,6 @@ public class HBaseMapState<T> implements IBackingMap<T> {
 
     }
 
-    @Override
     public List<T> multiGet(List<List<Object>> keys) {
         List<Get> gets = new ArrayList<Get>();
         for(List<Object> key : keys){
@@ -195,14 +209,13 @@ public class HBaseMapState<T> implements IBackingMap<T> {
         return retval;
     }
 
-    @Override
     public void multiPut(List<List<Object>> keys, List<T> values) {
         List<Put> puts = new ArrayList<Put>(keys.size());
         for (int i = 0; i < keys.size(); i++) {
             LOG.info("Partiton: {}, Key: {}, Value: {}", new Object[]{this.partitionNum, keys.get(i), new String(this.serializer.serialize(values.get(i)))});
             Put put = new Put(toRowKey(keys.get(i)));
             T val = values.get(i);
-            put.add(this.options.columnFamily.getBytes(),
+            put.addColumn(this.options.columnFamily.getBytes(),
                     this.options.qualifier.getBytes(),
                     this.serializer.serialize(val));
 
@@ -214,7 +227,9 @@ public class HBaseMapState<T> implements IBackingMap<T> {
             throw new FailedException("Interrupted while writing to HBase", e);
         } catch (RetriesExhaustedWithDetailsException e) {
             throw new FailedException("Retries exhaused while writing to HBase", e);
-        }
+        } catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 
 

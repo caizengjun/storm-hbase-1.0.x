@@ -65,13 +65,11 @@ public class SimpleHBaseMapper implements HBaseMapper {
 //        return this;
 //    }
 
-    @Override
     public byte[] rowKey(Tuple tuple) {
         Object objVal = tuple.getValueByField(this.rowKeyField);
         return toBytes(objVal);
     }
 
-    @Override
     public ColumnList columns(Tuple tuple) {
         ColumnList cols = new ColumnList();
         if(this.columnFields != null){

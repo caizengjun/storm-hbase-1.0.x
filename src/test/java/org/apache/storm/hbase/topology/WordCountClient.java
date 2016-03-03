@@ -19,9 +19,13 @@ package org.apache.storm.hbase.topology;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.Table;
 import org.apache.hadoop.hbase.util.Bytes;
 
 /**
@@ -36,9 +40,17 @@ public class WordCountClient {
         if(args.length > 0){
             config.set("hbase.rootdir", args[0]);
         }
+        
+        Connection connection = org.apache.hadoop.hbase.client.ConnectionFactory.createConnection(config);
+        
+		TableName tableName = TableName.valueOf("WordCount");
+		Admin admin = connection.getAdmin();
+		if (!admin.tableExists(tableName)) {
+        	System.out.println("Table does not exist.");
+        	System.exit(-1);
+        }
 
-        HTable table = new HTable(config, "WordCount");
-
+        Table table = connection.getTable(tableName, null);
 
         for (String word : WordSpout.words) {
             Get get = new Get(Bytes.toBytes(word));

@@ -50,7 +50,6 @@ import java.util.List;
  */
 public class WordCountValueMapper implements HBaseValueMapper {
 
-    @Override
     public List<Values> toValues(Result result) throws Exception {
         List<Values> values = new ArrayList<Values>();
         Cell[] cells = result.rawCells();
@@ -61,7 +60,6 @@ public class WordCountValueMapper implements HBaseValueMapper {
         return values;
     }
 
-    @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declare(new Fields("columnName","columnValue"));
     }

@@ -31,7 +31,6 @@ public class PrintFunction extends BaseFunction {
 
     private static final Random RANDOM = new Random();
 
-    @Override
     public void execute(TridentTuple tuple, TridentCollector tridentCollector) {
         if(RANDOM.nextInt(1000) > 995) {
             LOG.info(tuple.toString());

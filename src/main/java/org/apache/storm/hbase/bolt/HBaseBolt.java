@@ -53,7 +53,6 @@ public class HBaseBolt  extends AbstractHBaseBolt {
         return this;
     }
 
-    @Override
     public void execute(Tuple tuple) {
         byte[] rowKey = this.mapper.rowKey(tuple);
         ColumnList cols = this.mapper.columns(tuple);
@@ -70,7 +69,6 @@ public class HBaseBolt  extends AbstractHBaseBolt {
         this.collector.ack(tuple);
     }
 
-    @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
 
     }

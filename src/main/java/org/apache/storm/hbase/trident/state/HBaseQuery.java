@@ -26,12 +26,10 @@ import java.util.List;
 
 public class HBaseQuery extends BaseQueryFunction<HBaseState, List<Values>> {
 
-    @Override
     public List<List<Values>> batchRetrieve(HBaseState hBaseState, List<TridentTuple> tridentTuples) {
         return hBaseState.batchRetrieve(tridentTuples);
     }
 
-    @Override
     public void execute(TridentTuple tuples, List<Values> values, TridentCollector tridentCollector) {
         for (Values value : values) {
             tridentCollector.emit(value);

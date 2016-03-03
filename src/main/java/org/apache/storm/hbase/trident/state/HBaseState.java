@@ -112,12 +112,10 @@ public class HBaseState implements State {
         this.hBaseClient = new HBaseClient(conf, hbConfig, options.tableName);
     }
 
-    @Override
     public void beginCommit(Long aLong) {
         LOG.debug("beginCommit is noop.");
     }
 
-    @Override
     public void commit(Long aLong) {
         LOG.debug("commit is noop.");
     }
