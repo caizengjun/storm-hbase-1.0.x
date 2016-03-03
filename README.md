@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #Storm HBase
 
 Storm/Trident integration for [Apache HBase](https://hbase.apache.org)
@@ -186,3 +187,6 @@ public class PersistentWordCount {
     }
 }
 ```
+=======
+# storm-hbase-1.0.x
+>>>>>>> 93b8ed5b86c7fb1e54325524f793ef4543fa5176
